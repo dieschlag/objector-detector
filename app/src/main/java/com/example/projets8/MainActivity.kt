@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         cameraProviderProcess.addListener({
             // The Process is ready
             cameraProvider  = cameraProviderProcess.get()
-            bindCameraUseCases()
+            bindCamera()
         }, ContextCompat.getMainExecutor(this)) // le listener est executé sur le thread principal pour que ce soit thread safe
     }
 
@@ -124,8 +124,23 @@ class MainActivity : AppCompatActivity() {
             )
 
             preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+
         } catch(exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (allPermissionsGranted()){
+            startCamera()
+        } else {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, CODE_PERMISSIONS)
         }
     }
 

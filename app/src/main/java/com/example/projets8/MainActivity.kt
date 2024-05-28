@@ -1,10 +1,12 @@
 package com.example.projets8
 
 import android.Manifest
+
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Bundle
+
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
@@ -15,10 +17,12 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+
 import com.example.projets8.databinding.ActivityMainBinding
+
 import java.util.concurrent.ExecutorService
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), DetectorListener {
 
     private lateinit var binding: ActivityMainBinding
     private val isFrontCamera = false
@@ -27,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
+    private lateinit var detector: Detector
 
     private lateinit var cameraExecutor: ExecutorService
 
@@ -37,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         private val PERMISSIONS = mutableListOf (
             Manifest.permission.CAMERA
         ).toTypedArray()
+        const val MODEL_PATH = "model.tflite"
+        const val LABELS_PATH = "labels.txt"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +55,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             ActivityCompat.requestPermissions(this, PERMISSIONS, CODE_PERMISSIONS)
         }
-
+        detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
+        detector.setup()
     }
 
     // Gestion de la caméra :
@@ -144,12 +152,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDetect(boundingBoxes: List<Box>, inferenceTime: Long) {
+        runOnUiThread {
+            binding.inferenceTime.text = "${inferenceTime}ms"
+            binding.overlay.apply {
+                setResults(boundingBoxes)
+                invalidate()
+            }
+        }
+    }
 
     // Fonctions utilitaires (appelées par d'autres fonctions)
     private fun allPermissionsGranted() = PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
-
 
 
 

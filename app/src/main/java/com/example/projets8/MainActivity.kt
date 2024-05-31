@@ -4,7 +4,11 @@ import android.Manifest
 
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Matrix
+import android.graphics.Paint
+import android.graphics.Rect
 import android.os.Bundle
 
 import android.util.Log
@@ -17,10 +21,12 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts
 
 import com.example.projets8.databinding.ActivityMainBinding
 
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), DetectorListener {
 
@@ -35,6 +41,7 @@ class MainActivity : AppCompatActivity(), DetectorListener {
 
     private lateinit var cameraExecutor: ExecutorService
 
+
     //Déclaration d'éléments statiques à l'aide d'un companion :
     companion object {
         private const val TAG = "Camera"
@@ -44,10 +51,13 @@ class MainActivity : AppCompatActivity(), DetectorListener {
         ).toTypedArray()
         const val MODEL_PATH = "model.tflite"
         const val LABELS_PATH = "labels.txt"
+        private const val BOUNDING_RECT_TEXT_PADDING = 8
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Vérfification de l'accès à la caméra
         if (allPermissionsGranted()) {
@@ -55,8 +65,10 @@ class MainActivity : AppCompatActivity(), DetectorListener {
         } else {
             ActivityCompat.requestPermissions(this, PERMISSIONS, CODE_PERMISSIONS)
         }
-        detector = Detector(baseContext, MODEL_PATH, LABELS_PATH, this)
+        detector = Detector(baseContext, MODEL_PATH, LABELS_PATH,this)
         detector.setup()
+
+        cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
     // Gestion de la caméra :
@@ -119,6 +131,8 @@ class MainActivity : AppCompatActivity(), DetectorListener {
                 buffer, 0, 0, buffer.width, buffer.height,
                 rotate, true
             )
+
+            detector.detect(rotatedBitmap)
         }
 
         cameraProvider.unbindAll() //reset de tous les binds
@@ -161,11 +175,16 @@ class MainActivity : AppCompatActivity(), DetectorListener {
             }
         }
     }
+    override fun onEmptyDetect() {
+        binding.overlay.invalidate()
+    }
+
 
     // Fonctions utilitaires (appelées par d'autres fonctions)
     private fun allPermissionsGranted() = PERMISSIONS.all {
         ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
+
 
 
 

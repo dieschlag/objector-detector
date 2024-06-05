@@ -12,6 +12,12 @@ import android.graphics.Rect
 import android.os.Bundle
 
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.widget.ImageButton
+import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
 import androidx.camera.core.Camera
@@ -30,6 +36,7 @@ import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity(), DetectorListener {
 
+
     private lateinit var binding: ActivityMainBinding
     private val isFrontCamera = false
 
@@ -38,7 +45,8 @@ class MainActivity : AppCompatActivity(), DetectorListener {
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private lateinit var detector: Detector
-
+    private var modelName: String = "flowers_model.tflite"
+    private var labelName: String = "flowers_labels.txt"
     private lateinit var cameraExecutor: ExecutorService
 
 
@@ -49,7 +57,7 @@ class MainActivity : AppCompatActivity(), DetectorListener {
         private val PERMISSIONS = mutableListOf (
             Manifest.permission.CAMERA
         ).toTypedArray()
-        const val MODEL_PATH = "flowers.tflite"
+        const val MODEL_PATH = "flowers_model.tflite"
         const val LABELS_PATH = "new_labels.txt"
         private const val BOUNDING_RECT_TEXT_PADDING = 8
     }
@@ -59,16 +67,55 @@ class MainActivity : AppCompatActivity(), DetectorListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val menuButton: ImageButton = findViewById(R.id.menu_button)
+        menuButton.setOnClickListener { view ->
+            showPopupMenu(view)
+        }
+
         // Vérfification de l'accès à la caméra
         if (allPermissionsGranted()) {
             startCamera()
         } else {
             ActivityCompat.requestPermissions(this, PERMISSIONS, CODE_PERMISSIONS)
         }
-        detector = Detector(baseContext, MODEL_PATH, LABELS_PATH,this)
+        detector = Detector(baseContext, modelName, labelName,this)
         detector.setup()
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun showPopupMenu(view: View) {
+        val popup = PopupMenu(this, view)
+        val inflater: MenuInflater = popup.menuInflater
+        inflater.inflate(R.menu.popup_menu, popup.menu)
+        popup.setOnMenuItemClickListener { menuItem ->
+            onMenuItemClick(menuItem)
+        }
+        popup.show()
+    }
+
+    private fun onMenuItemClick(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_one -> {
+                if (modelName != "flowers_model.tflite") {
+                    modelName = "flowers_model.tflite"
+                    labelName = "flowers_labels.txt"
+                    detector = Detector(baseContext, modelName, labelName, this)
+                    detector.setup()
+                }
+                true
+            }
+            R.id.action_two -> {
+                if (modelName != "crockery_model.tflite") {
+                    modelName = "crockery_model.tflite"
+                    labelName = "crockery_labels.txt"
+                    detector = Detector(baseContext, modelName, labelName, this)
+                    detector.setup()
+                }
+                true
+            }
+            else -> false
+        }
     }
 
     // Gestion de la caméra :

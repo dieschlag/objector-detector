@@ -79,7 +79,7 @@ class   Detector(
         if (numChannel == 0) return
         if (numElements == 0) return
 
-        var inferenceTime = SystemClock.uptimeMillis()
+        var inferenceTime = SystemClock.uptimeMillis() // records the current time in ms, used to measure time taken for the inference process
 
         val resizedBitmap = Bitmap.createScaledBitmap(frame, tensorWidth, tensorHeight, false)
 
@@ -90,7 +90,6 @@ class   Detector(
 
         val output = TensorBuffer.createFixedSize(intArrayOf(1 , numChannel, numElements), OUTPUT_IMAGE_TYPE)
         interpreter?.run(imageBuffer, output.buffer)
-
 
         val bestBoxes = bestBox(output.floatArray)
         inferenceTime = SystemClock.uptimeMillis() - inferenceTime

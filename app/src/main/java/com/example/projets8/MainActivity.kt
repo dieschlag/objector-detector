@@ -49,8 +49,8 @@ class MainActivity : AppCompatActivity(), DetectorListener {
         private val PERMISSIONS = mutableListOf (
             Manifest.permission.CAMERA
         ).toTypedArray()
-        const val MODEL_PATH = "model.tflite"
-        const val LABELS_PATH = "labels.txt"
+        const val MODEL_PATH = "flowers.tflite"
+        const val LABELS_PATH = "new_labels.txt"
         private const val BOUNDING_RECT_TEXT_PADDING = 8
     }
 

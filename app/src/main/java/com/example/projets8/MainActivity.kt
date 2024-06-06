@@ -4,15 +4,9 @@ import android.Manifest
 
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Matrix
-import android.graphics.Paint
-import android.graphics.Rect
 import android.os.Bundle
-
 import android.util.Log
-import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
@@ -27,7 +21,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.activity.result.contract.ActivityResultContracts
+
 
 import com.example.projets8.databinding.ActivityMainBinding
 

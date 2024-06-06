@@ -1,5 +1,6 @@
 package com.example.projets8
 
+//characteristics used to draw the boxes on the canvas defined in Overlay to show a detected element
 data class Box(
     val x1: Float,
     val y1: Float,

@@ -34,6 +34,7 @@ class Overlay(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     private fun initPaints() {
+        //defines parameters used to draw on the Canva
         textBackgroundPaint.color = Color.BLACK
         textBackgroundPaint.style = Paint.Style.FILL
         textBackgroundPaint.textSize = 50f
@@ -48,6 +49,8 @@ class Overlay(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     override fun draw(canvas: Canvas) {
+        //Is used to draw the boxes on the canvas
+
         super.draw(canvas)
 
         results.forEach {
@@ -75,6 +78,7 @@ class Overlay(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
     }
 
     fun setResults(boundingBoxes: List<Box>) {
+        //used to update results
         results = boundingBoxes
         invalidate()
     }

@@ -102,9 +102,9 @@ class MainActivity : AppCompatActivity(), DetectorListener {
                 true
             }
             R.id.action_two -> {
-                if (modelName != "crockery_model.tflite") {
-                    modelName = "crockery_model.tflite"
-                    labelName = "crockery_labels.txt"
+                if (modelName != "animals_model.tflite") {
+                    modelName = "animals_model.tflite"
+                    labelName = "animals_labels.txt"
                     detector = Detector(baseContext, modelName, labelName, this)
                     detector.setup()
                 }
@@ -118,7 +118,7 @@ class MainActivity : AppCompatActivity(), DetectorListener {
     // Camera Management
     //-------------------------------------------
     private fun startCamera() {
-        val cameraProviderProcess = ProcessCameraProvider.getInstance(this) // Returns a ListenableFuture<ProcessCameraProvider>
+            val cameraProviderProcess = ProcessCameraProvider.getInstance(this) // Returns a ListenableFuture<ProcessCameraProvider>
         cameraProviderProcess.addListener({ // a listener is used on the process so that once it is completely started, we can get an instance
             // The Process is ready
             cameraProvider  = cameraProviderProcess.get()
